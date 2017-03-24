@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import datetime
+import datetime
 
 LENGTH = 47133
 
@@ -9,13 +9,12 @@ INCEDENTS = DATA.iterrows()
 def calc_avg_resp_time(incidents):
     delta = 0
     for incedent in incidents:
-        arrived = datetime.strptime(incedent[1]["Time Arrived on Scene"], '%m/%d/%Y %I:%M:%S %p')
-        callRecieved = datetime.strptime(incedent[1][0], '%m/%d/%Y %I:%M:%S %p')
-        deltaHour = (int(callRecieved.hour) - int(arrived.hour)) * 60
-        deltaMinute = abs(int(callRecieved.minute) - int(arrived.minute))
-        delta += deltaHour + deltaMinute
-
-    averageRespTime = delta / LENGTH
+        arrived = datetime.datetime.strptime(incedent[1]["Time Vehicle was Dispatched"], '%m/%d/%Y %I:%M:%S %p')
+        callRecieved = datetime.datetime.strptime(incedent[1][0], '%m/%d/%Y %I:%M:%S %p')
+        diff = (arrived - callRecieved)
+        coupleMinutes = datetime.timedelta(minutes=10)
+        if diff > coupleMinutes:
+            print(diff)
 
     return averageRespTime
 
