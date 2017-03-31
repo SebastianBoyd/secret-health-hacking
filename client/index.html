@@ -1,19 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
 
-<html>
+body {
+  font: 12px sans-serif;
+}
 
-  <head>
-    <title>Hack4Health</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-    <script src="node_modules/datamaps/dist/datamaps.all.min.js"></script>
-    <script defer src="script.js"></script>
-  </head>
+path {
+  stroke-width: 1px;
+  stroke: white;
+  fill: steelblue;
+  cursor: pointer;
+}
 
-  <body>
-    Title
-    <div id="container"></div>
-  </body>
+path:hover, path.highlighted {
+  fill: tomato;
+}
 
-</html>
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+//Map dimensions (in pixels)
+var width = 519,
+    height = 600;
+
+//Map projection
+var projection = d3.geo.mercator()
+    .scale(46567.862117552664)
+    .center([-122.72168747117493,38.09163738233181]) //projection center
+    .translate([width/2,height/2]) //translate to center the map in view
+
+//Generate paths based on projection
+var path = d3.geo.path()
+    .projection(projection);
+
+//Create an SVG
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+//Group for the map features
+var features = svg.append("g")
+    .attr("class","features");
+
+//Create zoom/pan listener
+//Change [1,Infinity] to adjust the min/max zoom scale
+var zoom = d3.behavior.zoom()
+    .scaleExtent([1, Infinity])
+    .on("zoom",zoomed);
+
+svg.call(zoom);
+
+d3.json("zipcodes.geojson",function(error,geodata) {
+  if (error) return console.log(error); //unknown error, check the console
+
+  //Create a path for each map feature in the data
+  features.selectAll("path")
+    .data(geodata.features)
+    .enter()
+    .append("path")
+    .attr("d",path)
+    .on("click",clicked);
+
+});
+
+// Add optional onClick events for features here
+// d.properties contains the attributes (e.g. d.properties.name, d.properties.population)
+function clicked(d,i) {
+
+}
+
+
+//Update map on zoom/pan
+function zoomed() {
+  features.attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")")
+      .selectAll("path").style("stroke-width", 1 / zoom.scale() + "px" );
+}
+
+</script>
