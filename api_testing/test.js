@@ -9,6 +9,7 @@ consumer.query()
     .withDataset('3k92-tyja')
     .limit(5)
     .where({ 'City': 'SAN RAFAEL' })
+    .where({ 'Case ID': 4565648 })
     .getRows()
         .on('success', function(rows) { console.log(rows); })
         .on('error', function(error) { console.log(error); });
