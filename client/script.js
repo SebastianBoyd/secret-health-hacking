@@ -25,8 +25,8 @@ var features = svg.append("g")
     .attr("class","features");
 
 // Generate colors
-var color = d3.scaleThreshold()
-    .domain(d3.range(2, 10))
+var color = d3.scaleLinear()
+    .domain([1, 30, 50, 60, 70, 120, 200, 300])
     .range(d3.schemeBlues[9]);
 
 //Create zoom/pan listener
@@ -43,9 +43,9 @@ datasets['dispachTime'] = {};
 datasets['hospitalized'] = {};
 d3.queue()
     .defer(d3.json, "zipcodes.geojson")
-    .defer(d3.tsv, "response_time.tsv", function(d) { datasets['responseTime'][d.id] = d.rate; })
-    .defer(d3.tsv, "dispach_time.tsv", function(d) { datasets['dispachTime'][d.id] = d.rate; })
-    .defer(d3.tsv, "hospitalized.tsv", function(d) { datasets['hospitalized'][d.id] = d.rate; })
+    .defer(d3.tsv, "response_time.tsv", function(d) { datasets['responseTime'][d.zip_code] = d.value; })
+    .defer(d3.tsv, "dispach_time.tsv", function(d) { datasets['dispachTime'][d.zip_code] = d.value; })
+    .defer(d3.tsv, "hospitalized.tsv", function(d) { datasets['hospitalized'][d.zip_code] = d.value; })
     .await(ready);
 
 
