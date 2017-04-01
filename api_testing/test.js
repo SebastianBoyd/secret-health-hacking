@@ -13,3 +13,12 @@ consumer.query()
     .getRows()
         .on('success', function(rows) { console.log(rows); })
         .on('error', function(error) { console.log(error); });
+
+var emq = function() {
+    consumer.query()
+        .withDataset('7bzr-ymkc')
+        .select('time_vehicle_was_dispatched')
+        .getRows()
+            .on('success', function(rows) { console.log(rows); })
+            .on('error', function(error) { console.log(error); });
+};
