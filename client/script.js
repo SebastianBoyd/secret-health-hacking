@@ -51,7 +51,7 @@ d3.queue()
 
 
 function ready(error,geodata) {
-  if (error) return console.log(error); //unknown error, check the console
+  if (error) console.log(error); //unknown error, check the console
 
   //Create a path for each map feature in the data
   features.selectAll("path")
