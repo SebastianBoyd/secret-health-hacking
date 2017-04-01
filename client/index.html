@@ -13,7 +13,7 @@ path {
 }
 
 path:hover, path.highlighted {
-  fill: tomato;
+  fill: #999;
 }
 
 </style>
@@ -73,12 +73,14 @@ var zoom = d3.zoom()
 svg.call(zoom);
 
 var datasets = {}; // Not a literal map
-datasets['responseTime'] = {}
+datasets['responseTime'] = {};
+datasets['dispachTime'] = {};
+datasets['hospitalized'] = {};
 d3.queue()
     .defer(d3.json, "zipcodes.geojson")
-    .defer(d3.tsv, "unemployment.tsv", function(d) {
-      datasets['responseTime'][d.id] = d.rate;
-    })
+    .defer(d3.tsv, "response_time.tsv", function(d) { datasets['responseTime'][d.id] = d.rate; })
+    .defer(d3.tsv, "dispach_time.tsv", function(d) { datasets['dispachTime'][d.id] = d.rate; })
+    .defer(d3.tsv, "hospitalized.tsv", function(d) { datasets['hospitalized'][d.id] = d.rate; })
     .await(ready);
 
 
@@ -92,14 +94,13 @@ function ready(error,geodata) {
     .enter()
     .append("path")
       .attr("d",path)
-      .attr("fill", function(d) { console.log(d.properties.zip_code_geo); return color(d.rate = datasets['responseTime'][d.properties.zip_code_geo]); })
+      .attr("fill", function(d) { return color(d.rate = datasets['responseTime'][d.properties.zip_code_geo]); })
     .on("click",clicked);
 
 }
 
 function changeDataset(e) {
   datasetName = e.target.id;
-  console.log(datasets[datasetName]);
   features.selectAll("path")
     .attr("fill", function(d) {
       if (datasets[datasetName]) {
