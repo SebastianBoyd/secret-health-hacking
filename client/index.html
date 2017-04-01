@@ -20,9 +20,21 @@ path:hover, path.highlighted {
 <body>
 <script src="http://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-<script>
 
-var unemployment = d3.map(); //Not a literal map
+<form id="dataSelector">
+  <input type="radio" id="responseTime" name="dataset" value="responseTime" checked >
+  <label for="responseTime">Response Time</label>
+  <br>
+  <input type="radio" id="dispachTime" name="dataset" value="dispachTime">
+  <label for="dispachTime">Dispach Time</label>
+  <br>
+  <input type="radio" id="hospitalized" name="dataset" value="hospitalized">
+  <label for="hospitalized">Precent Hospitalized</label>
+</form>
+
+<script>
+var form = document.getElementById('dataSelector');
+form.addEventListener('change', changeDataset);
 
 //Map dimensions (in pixels)
 var width = 519,
@@ -60,11 +72,16 @@ var zoom = d3.zoom()
 
 svg.call(zoom);
 
-
+var datasets = {}; // Not a literal map
+datasets['responseTime'] = {}
 d3.queue()
     .defer(d3.json, "zipcodes.geojson")
-    .defer(d3.tsv, "unemployment.tsv", function(d) { unemployment.set(d.id, +d.rate); })
+    .defer(d3.tsv, "unemployment.tsv", function(d) {
+      datasets['responseTime'][d.id] = d.rate;
+    })
     .await(ready);
+
+
 
 function ready(error,geodata) {
   if (error) return console.log(error); //unknown error, check the console
@@ -75,9 +92,23 @@ function ready(error,geodata) {
     .enter()
     .append("path")
       .attr("d",path)
-      .attr("fill", function(d) { console.log(d.properties.zip_code_geo); return color(d.rate = unemployment.get(d.properties.zip_code_geo)); })
+      .attr("fill", function(d) { console.log(d.properties.zip_code_geo); return color(d.rate = datasets['responseTime'][d.properties.zip_code_geo]); })
     .on("click",clicked);
 
+}
+
+function changeDataset(e) {
+  datasetName = e.target.id;
+  console.log(datasets[datasetName]);
+  features.selectAll("path")
+    .attr("fill", function(d) {
+      if (datasets[datasetName]) {
+        return color(datasets[datasetName][d.properties.zip_code_geo]);
+      }
+      else {
+        return '#000000';
+      }
+    })
 }
 
 // Add optional onClick events for features here
